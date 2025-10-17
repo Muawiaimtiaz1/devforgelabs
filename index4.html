@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevForge Labs - Enterprise AI, ERP, and Tech Education</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        /* BASE STYLES & FONT */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F8F8F8;
+            color: #1A1A1A;
+            overflow-x: hidden;
+            /* Added this to fix preloader scroll issue */
+            overflow-y: hidden; 
+        }
+        
+        .accent-color { color: #7f4a88; }
+        .bg-accent-color { background-color: #7f4a88; }
+        .border-accent-color { border-color: #7f4a88; }
+
+        /* General Styling */
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Animations & Gradients */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .text-gradient {
+            background: linear-gradient(90deg, #7f4a88 0%, #a07ba0 50%, #7f4a88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-divider {
+            position: relative;
+            margin-top: -1px;
+            height: 60px;
+            background: linear-gradient(to right, #7f4a8820, transparent, #7f4a8820);
+        }
+        .section-divider::before, .section-divider::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #F8F8F8;
+            z-index: 1;
+        }
+        .section-divider::before { top: -30px; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
+        .section-divider::after { bottom: -30px; border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+        
+        /* HERO STYLING (Planet and Background) */
+        #hero-section {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #F8F8F8 0%, #e0e0e0 100%);
+        }
+        #hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1536412599178-5e5157451877?q=80&w=1920&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') center top / cover no-repeat;
+            opacity: 0.12;
+            z-index: 0;
+            animation: subtleZoomPan 60s infinite alternate;
+        }
+        @keyframes subtleZoomPan {
+            0% { background-position: center top; background-size: 105%; }
+            100% { background-position: center bottom; background-size: 100%; }
+        }
+        .planet-glow {
+            /* This is the violet glow that looks like a rising planet or nebula */
+            position: absolute;
+            bottom: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vw;
+            height: 100vw;
+            max-width: 1400px;
+            max-height: 1400px;
+            background: radial-gradient(circle at 50% 100%, #7f4a8870 0%, #7f4a8800 60%);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: planetRise 20s ease-out forwards, subtlePulse 10s infinite ease-in-out alternate;
+            z-index: 1;
+        }
+        @keyframes planetRise {
+            0% { bottom: -80%; opacity: 0; }
+            50% { opacity: 0.7; }
+            100% { bottom: -50%; opacity: 1; }
+        }
+        @keyframes subtlePulse {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+            100% { transform: translateX(-50%) scale(1.02); opacity: 1; }
+        }
+        
+        /* Preloader Styles */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0A001A;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.7s ease-out;
+        }
+        .spinner {
+            width: 60px; height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #7f4a88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #preloader.hidden { opacity: 0; pointer-events: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="preloader"><div class="spinner"></div></div>
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/70 backdrop-blur-md border-b border-gray-200">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-3xl font-extrabold text-[#1A1A1A] uppercase">DevForge<span class="accent-color">.</span>Labs</a>
+            
+            <nav class="hidden md:flex space-x-8 text-lg font-medium items-center">
+                <a href="#solutions" class="text-gray-700 hover:accent-color transition-colors duration-300">Solutions</a>
+                <a href="#academics" class="text-gray-700 hover:accent-color transition-colors duration-300">Academics</a>
+                <a href="#spark" class="text-gray-700 hover:accent-color transition-colors duration-300">DevForge Spark</a>
+                <a href="#team" class="text-gray-700 hover:accent-color transition-colors duration-300">Our Team</a>
+                <a href="#contact" class="ml-4 bg-accent-color text-white font-semibold px-6 py-2 rounded-full shadow-md hover:shadow-lg hover:brightness-110 transform hover:-translate-y-0.5 transition-all duration-300">
+                    Get a Quote
+                </a>
+            </nav>
+
+            <button id="menu-btn" class="md:hidden focus:outline-none z-50 text-[#1A1A1A]">
+                <i id="menu-open-icon" class="fas fa-bars text-2xl"></i>
+                <i id="menu-close-icon" class="fas fa-times text-2xl hidden"></i>
+            </button>
+        </div>
+        
+        <div id="mobile-menu" class="hidden md:hidden absolute top-0 left-0 w-full h-screen bg-white flex flex-col items-center justify-center space-y-8 text-2xl font-semibold">
+            <a href="#solutions" class="mobile-link text-[#1A1A1A] hover:accent-color">Solutions</a>
+            <a href="#academics" class="mobile-link text-[#1A1A1A] hover:accent-color">Academics</a>
+            <a href="#spark" class="mobile-link text-[#1A1A1A] hover:accent-color">DevForge Spark</a>
+            <a href="#team" class="mobile-link text-[#1A1A1A] hover:accent-color">Our Team</a>
+            <a href="#contact" class="mobile-link text-[#1A1A1A] hover:accent-color">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="min-h-screen flex items-center justify-center text-center px-6 pt-24" id="hero-section">
+            <div class="planet-glow"></div> 
+            <div class="max-w-5xl z-10 relative"> 
+                <h1 class="text-5xl md:text-8xl font-extrabold leading-tight text-gradient mb-4"style="line-height:1.29">
+                    The Future, Engineered.
+                </h1>
+                <p class="mt-6 text-xl md:text-2xl text-gray-800 max-w-3xl mx-auto">
+                    DevForge Labs builds real-world **ERP and AI Solutions** while cultivating the next generation of tech leaders through our specialized academies.
+                </p>
+                <div class="mt-12 flex flex-col sm:flex-row justify-center gap-5">
+                    <a href="#solutions" class="bg-accent-color text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:shadow-xl hover:brightness-110 transform hover:-translate-y-1 transition-all duration-300 text-lg">
+                        Explore Our Solutions
+                    </a>
+                    <a href="#contact" class="border border-gray-300 text-gray-800 font-semibold px-10 py-4 rounded-full hover:bg-gray-100 hover:border-gray-400 transition-all duration-300 text-lg">
+                        Partner With Us
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-20 md:py-28 bg-[#F8F8F8] fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-6 text-[#1A1A1A]">Our Ecosystem: Innovate, Build, Teach</h2>
+                        <p class="text-gray-700 text-lg leading-relaxed">
+                            DevForge Labs is structured to deliver maximum value in the tech landscape. We leverage cutting-edge AI research to build resilient **Enterprise Resource Planning (ERP)** systems, ensuring our corporate clients are efficient and future-proof. Crucially, our commitment to knowledge means we train the talent that powers tomorrow, keeping us at the forefront of industry shifts.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center glass-card p-8 rounded-2xl">
+                        <div>
+                            <span class="text-6xl font-extrabold accent-color">12+</span>
+                            <p class="mt-2 text-gray-600 font-medium">Enterprise Clients</p>
+                        </div>
+                        <div>
+                            <span class="text-6xl font-extrabold accent-color">1.5M+</span>
+                            <p class="mt-2 text-gray-600 font-medium">Code Lines Deployed</p>
+                        </div>
+                        <div>
+                            <span class="text-6xl font-extrabold accent-color">3</span>
+                            <p class="mt-2 text-gray-600 font-medium">Core Business Pillars</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+        <section id="solutions" class="py-20 md:py-28 bg-white fade-in-section">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-[#1A1A1A]">Pillar 1: Enterprise Solutions</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-700 text-lg">Transforming businesses with bespoke ERP systems and intelligent AI automation.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+                    <div class="glass-card p-8 rounded-2xl hover:scale-[1.03] transition-all duration-300 flex flex-col items-center text-center">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6"><i class="fas fa-warehouse text-4xl accent-color"></i></div>
+                        <h3 class="text-2xl font-bold mb-3 text-[#1A1A1A]">Custom ERP Platforms</h3>
+                        <p class="text-gray-600 mb-6 flex-grow">Integrated systems for finance, HR, and supply chain, designed for scalability and efficiency.</p>
+                        <a href="#" class="font-semibold accent-color hover:underline text-lg">View Case Studies &rarr;</a>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl hover:scale-[1.03] transition-all duration-300 flex flex-col items-center text-center">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6"><i class="fas fa-robot text-4xl accent-color"></i></div>
+                        <h3 class="text-2xl font-bold mb-3 text-[#1A1A1A]">AI & Machine Learning</h3>
+                        <p class="text-gray-600 mb-6 flex-grow">Predictive analytics, custom recommendation engines, and automated data processing solutions.</p>
+                        <a href="#" class="font-semibold accent-color hover:underline text-lg">Learn About AI &rarr;</a>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl hover:scale-[1.03] transition-all duration-300 flex flex-col items-center text-center">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6"><i class="fas fa-cloud-arrow-up text-4xl accent-color"></i></div>
+                        <h3 class="text-2xl font-bold mb-3 text-[#1A1A1A]">Cloud Migration & Security</h3>
+                        <p class="text-gray-600 mb-6 flex-grow">Secure cloud architecture and robust cybersecurity consulting for modern enterprises.</p>
+                        <a href="#" class="font-semibold accent-color hover:underline text-lg">Secure Your Data &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        <section id="academics" class="py-20 md:py-28 bg-[#F8F8F8] fade-in-section">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-[#1A1A1A]">Pillar 2: DevForge Labs Academia</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-700 text-lg">Our dedicated training division, building highly-skilled tech professionals for the global market.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16">
+                    <div class="glass-card p-8 rounded-2xl flex flex-col items-center text-center">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6"><i class="fas fa-brain text-4xl accent-color"></i></div>
+                        <h3 class="text-2xl font-bold mb-3 text-[#1A1A1A]">AI Specialization</h3>
+                        <p class="text-gray-600 mb-6 flex-grow">Master Machine Learning, Deep Learning, and data pipeline construction for industry.</p>
+                        <a href="#" class="font-semibold accent-color hover:underline text-lg">View Academics Site &rarr;</a>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl flex flex-col items-center text-center">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6"><i class="fas fa-globe text-4xl accent-color"></i></div>
+                        <h3 class="text-2xl font-bold mb-3 text-[#1A1A1A]">Full-Stack Engineering</h3>
+                        <p class="text-gray-600 mb-6 flex-grow">Comprehensive training in modern web and application development, from UI to cloud backends.</p>
+                        <a href="#" class="font-semibold accent-color hover:underline text-lg">View Academics Site &rarr;</a>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl flex flex-col items-center text-center">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6"><i class="fas fa-rocket text-4xl accent-color"></i></div>
+                        <h3 class="text-2xl font-bold mb-3 text-[#1A1A1A]">Game Dev & VR/AR</h3>
+                        <p class="text-gray-600 mb-6 flex-grow">Design, coding, and deployment of interactive digital environments and gaming experiences.</p>
+                        <a href="#" class="font-semibold accent-color hover:underline text-lg">View Academics Site &rarr;</a>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl flex flex-col items-center text-center">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6"><i class="fas fa-magic text-4xl accent-color"></i></div>
+                        <h3 class="text-2xl font-bold mb-3 text-[#1A1A1A]">Digital Media & VFX</h3>
+                        <p class="text-gray-600 mb-6 flex-grow">Professional skills in video editing, 3D modeling, and visual effects for film and advertising.</p>
+                        <a href="#" class="font-semibold accent-color hover:underline text-lg">View Academics Site &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+        <section id="spark" class="py-20 md:py-28 bg-white fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <div class="glass-card p-10 rounded-2xl">
+                        <div class="p-4 rounded-full bg-accent-color/10 mb-6 inline-block"><i class="fas fa-lightbulb text-4xl accent-color"></i></div>
+                        <h3 class="text-3xl font-bold mb-4 text-[#1A1A1A]">Pillar 3: DevForge Spark - R&D</h3>
+                        <p class="text-gray-700 text-lg leading-relaxed">
+                            **DevForge Spark** is our dedicated research and innovation lab. Here, our senior developers, AI scientists, and top alumni collaborate on future technologies, open-source contributions, and internal prototypes. Spark is the engine that keeps our solutions and academic curricula perpetually modern.
+                        </p>
+                        <a href="#" class="mt-6 inline-block font-semibold accent-color hover:underline text-lg">See Our Research Initiatives &rarr;</a>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-[#F8F8F8] rounded-xl shadow-md">
+                            <h4 class="font-bold text-xl accent-color mb-2">Advanced Robotics Prototypes</h4>
+                            <p class="text-gray-600">Developing AI-driven robotic process automation (RPA) tools for manufacturing.</p>
+                        </div>
+                        <div class="p-6 bg-[#F8F8F8] rounded-xl shadow-md">
+                            <h4 class="font-bold text-xl accent-color mb-2">Quantum Computing Simulation</h4>
+                            <p class="text-gray-600">Exploring low-latency networking solutions and quantum-safe encryption standards.</p>
+                        </div>
+                        <div class="p-6 bg-[#F8F8F8] rounded-xl shadow-md">
+                            <h4 class="font-bold text-xl accent-color mb-2">Blockchain Applications</h4>
+                            <p class="text-gray-600">Building decentralized ledger technologies for secure supply chain tracking.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+        <section id="team" class="py-20 md:py-28 bg-[#F8F8F8] fade-in-section">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-[#1A1A1A]">Our Stellar Mentors & Engineers</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-700 text-lg">The diverse minds powering our solutions, research, and academic programs.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mt-16">
+                    <div class="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+                        <img src="https://i.pravatar.cc/150?img=11" alt="Team Member 1" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-accent-color/30 object-cover shadow-inner">
+                        <h3 class="text-2xl font-bold text-[#1A1A1A]">Ayesha Khan</h3>
+                        <p class="accent-color font-medium text-lg mt-1">Lead AI Architect & Lecturer</p>
+                        <div class="flex justify-center space-x-4 mt-4 text-gray-500"><a href="#" class="hover:accent-color"><i class="fab fa-linkedin text-xl"></i></a><a href="#" class="hover:accent-color"><i class="fab fa-github text-xl"></i></a></div>
+                    </div>
+                    <div class="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="Team Member 2" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-accent-color/30 object-cover shadow-inner">
+                        <h3 class="text-2xl font-bold text-[#1A1A1A]">Bilal Ahmed</h3>
+                        <p class="accent-color font-medium text-lg mt-1">ERP Systems Principal</p>
+                        <div class="flex justify-center space-x-4 mt-4 text-gray-500"><a href="#" class="hover:accent-color"><i class="fab fa-linkedin text-xl"></i></a><a href="#" class="fab fa-github hover:accent-color text-xl"></i></a></div>
+                    </div>
+                    <div class="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+                        <img src="https://i.pravatar.cc/150?img=13" alt="Team Member 3" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-accent-color/30 object-cover shadow-inner">
+                        <h3 class="text-2xl font-bold text-[#1A1A1A]">Fatima Ali</h3>
+                        <p class="accent-color font-medium text-lg mt-1">DevForge Spark Researcher</p>
+                        <div class="flex justify-center space-x-4 mt-4 text-gray-500"><a href="#" class="hover:accent-color"><i class="fab fa-linkedin text-xl"></i></a><a href="#" class="fab fa-twitter hover:accent-color text-xl"></i></a></div>
+                    </div>
+                    <div class="text-center bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+                        <img src="https://i.pravatar.cc/150?img=14" alt="Team Member 4" class="w-36 h-36 rounded-full mx-auto mb-6 border-4 border-accent-color/30 object-cover shadow-inner">
+                        <h3 class="text-2xl font-bold text-[#1A1A1A]">Usman Tariq</h3>
+                        <p class="accent-color font-medium text-lg mt-1">Cloud & Security Consultant</p>
+                        <div class="flex justify-center space-x-4 mt-4 text-gray-500"><a href="#" class="hover:accent-color"><i class="fab fa-linkedin text-xl"></i></a><a href="#" class="fab fa-youtube hover:accent-color text-xl"></i></a></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+        <section id="reviews" class="py-20 md:py-28 bg-white fade-in-section">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-bold text-center text-[#1A1A1A]">Client & Alumni Testimonials</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-gray-700 text-lg text-center">Evidence of excellence across our solutions and academic divisions.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+                    <div class="glass-card p-8 rounded-2xl hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                        <i class="fas fa-quote-left text-3xl accent-color mb-6"></i>
+                        <p class="text-gray-700 mb-6 text-lg leading-relaxed">"Their custom ERP solution revolutionized our inventory management. The team was professional, the deployment was flawless, and the ongoing support is exceptional."</p>
+                        <div class="flex items-center mt-6">
+                            <img src="https://i.pravatar.cc/150?img=15" alt="Client 1" class="w-14 h-14 rounded-full mr-4 object-cover border-2 border-accent-color/20">
+                            <div>
+                                <h4 class="font-bold text-xl text-[#1A1A1A]">Zara Siddiqui</h4>
+                                <p class="text-sm text-gray-500">COO, Global Supply Chain Co.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                        <i class="fas fa-quote-left text-3xl accent-color mb-6"></i>
+                        <p class="text-gray-700 mb-6 text-lg leading-relaxed">"The AI specialization track was phenomenal. I went from a graduate to an ML Specialist in six months, directly applying the real-world methodologies taught by the DevForge team."</p>
+                        <div class="flex items-center mt-6">
+                            <img src="https://i.pravatar.cc/150?img=16" alt="Alumnus 2" class="w-14 h-14 rounded-full mr-4 object-cover border-2 border-accent-color/20">
+                            <div>
+                                <h4 class="font-bold text-xl text-[#1A1A1A]">Omar Khan</h4>
+                                <p class="text-sm text-gray-500">Machine Learning Specialist, DataForge</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                        <i class="fas fa-quote-left text-3xl accent-color mb-6"></i>
+                        <p class="text-gray-700 mb-6 text-lg leading-relaxed">"Working with DevForge Spark on the blockchain prototype was insightful. Their R&D speed and technical depth are truly market-leading. They are solving problems before they exist."</p>
+                        <div class="flex items-center mt-6">
+                            <img src="https://i.pravatar.cc/150?img=17" alt="Partner 3" class="w-14 h-14 rounded-full mr-4 object-cover border-2 border-accent-color/20">
+                            <div>
+                                <h4 class="font-bold text-xl text-[#1A1A1A]">Meher Tabassum</h4>
+                                <p class="text-sm text-gray-500">Director of Innovation, FutureTech</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider"></div>
+        <section id="contact" class="py-20 md:py-28 bg-[#F8F8F8] fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="max-w-4xl mx-auto text-center">
+                     <h2 class="text-4xl md:text-5xl font-bold text-[#1A1A1A]">Ready to Forge Your Future?</h2>
+                     <p class="mt-4 text-gray-700 text-lg">Whether you need an enterprise solution or world-class training, let's connect.</p>
+                </div>
+                <div class="max-w-2xl mx-auto mt-16 glass-card p-10 rounded-2xl">
+                    <form action="https://formsubmit.co/muawiaimtiaz@gmail.com" method="POST" class="grid grid-cols-1 gap-8">
+                        <input type="text" name="name" placeholder="Your Name" required class="bg-white/50 border border-gray-300 rounded-lg p-4 w-full focus:ring-2 focus:ring-accent-color focus:outline-none transition-shadow text-[#1A1A1A]">
+                        <input type="email" name="email" placeholder="Your Work Email" required class="bg-white/50 border border-gray-300 rounded-lg p-4 w-full focus:ring-2 focus:ring-accent-color focus:outline-none transition-shadow text-[#1A1A1A]">
+                        <select name="service" required class="bg-white/50 border border-gray-300 rounded-lg p-4 w-full focus:ring-2 focus:ring-accent-color focus:outline-none transition-shadow text-[#1A1A1A]">
+                            <option value="">I am interested in...</option>
+                            <option value="erp-ai">Enterprise ERP/AI Solutions</option>
+                            <option value="academics">DevForge Labs Academics (Training)</option>
+                            <option value="spark">DevForge Spark (R&D Partnership)</option>
+                            <option value="careers">Careers at DevForge Labs</option>
+                        </select>
+                        <textarea name="message" rows="6" placeholder="Tell us more about your project or goal." required class="bg-white/50 border border-gray-300 rounded-lg p-4 w-full focus:ring-2 focus:ring-accent-color focus:outline-none transition-shadow text-[#1A1A1A]"></textarea>
+                        <button type="submit" class="bg-accent-color text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:brightness-110 transform hover:scale-105 transition-all duration-300 w-full text-lg">
+                            Request Consultation
+                        </button>
+                        
+                    </form>
+                    <div class="text-center mt-12">
+                        <p class="text-gray-600 mb-6 text-lg">Find us across the digital cosmos:</p>
+                        <div class="flex justify-center space-x-8">
+                            <a href="#" class="text-gray-500 hover:accent-color transition-colors text-3xl"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-gray-500 hover:accent-color transition-colors text-3xl"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-gray-500 hover:accent-color transition-colors text-3xl"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-gray-500 hover:accent-color transition-colors text-3xl"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container mx-auto px-6 text-center md:flex md:justify-between md:items-center">
+            <p class="text-gray-500 text-md">&copy; 2025 DevForge Labs. All Rights Reserved.</p>
+            <div class="flex justify-center space-x-8 mt-6 md:mt-0 text-lg">
+                <a href="#solutions" class="text-gray-600 hover:accent-color transition-colors">Solutions</a>
+                <a href="#academics" class="text-gray-600 hover:accent-color transition-colors">Academics</a>
+                <a href="#spark" class="text-gray-600 hover:accent-color transition-colors">R&D</a>
+                <a href="#team" class="text-gray-600 hover:accent-color transition-colors">Careers</a>
+                <a href="#" class="text-gray-600 hover:accent-color transition-colors">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Preloader Script ---
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.classList.add('hidden');
+                // Re-enable vertical scroll once page is loaded
+                document.body.style.overflowY = 'scroll'; 
+            }
+        });
+
+        // --- Mobile Menu Toggle ---
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuOpenIcon = document.getElementById('menu-open-icon');
+        const menuCloseIcon = document.getElementById('menu-close-icon');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        const toggleMenu = () => {
+            mobileMenu.classList.toggle('hidden');
+            menuOpenIcon.classList.toggle('hidden');
+            menuCloseIcon.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+        };
+        
+        menuBtn.addEventListener('click', toggleMenu);
+        
+        // Close menu when a link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        // --- Fade-in on Scroll Animation ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Stop observing once visible if you only want it to happen once
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, {
+            threshold: 0.1 // Trigger when 10% of the element is visible
+        });
+
+        const sections = document.querySelectorAll('.fade-in-section');
+        sections.forEach((section) => {
+            observer.observe(section);
+        });
+    </script>
+    <a href="https://wa.me/+923226155209?text=Hello%20DevForge%20Labs%2C%20I%20have%20an%20inquiry." 
+   target="_blank" 
+   class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white font-semibold px-4 py-3 rounded-full shadow-2xl hover:brightness-110 transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+    <i class="fab fa-whatsapp text-2xl"></i> Chat Now
+</a>
+</body>
+</html>
